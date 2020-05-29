@@ -26,13 +26,15 @@ server.register('@hapi-lib/joi-kit', {
 
   // assign to validate options to be used in the route
   setMixin({ server, request, options, Kit, Joi }) {
-    Kit.joi = () => Joi;
+    options.Joi = () => Joi;
     options.Kit = Kit;
   },
 });
 ```
 
 ## use in router
+
+[validate options](https://github.com/hapijs/joi/blob/master/API.md#anyvalidatevalue-options)
 
 ```js
 server.route({
@@ -41,29 +43,48 @@ server.route({
   options: {
     validate: {
       payload(value, { Kit }) {
-        return Kit.schema({
-          username: Kit.joi().string().min(3).max(18).required(),
-        });
+        return (
+          Kit
+            // kit.options set joi validate options, it is not for the joi-kit plugin
+            .options({
+              errors: {
+                wrap: {
+                  label: '^',
+                },
+              },
+            })
+            // use format for object
+            // or use schema for a Joi schema, eg:
+            // .schema(Joi.objects().keys({
+            //   username: Joi.string().min(3).max(18).required(),
+            // }))
+            .format({
+              username: Joi.string()
+                .min(3)
+                .max(18)
+                .required()
+                .label(
+                  // auto use the correct i18n source provided through Kit.i18n()
+                  // and the second params is the default text when can not match the corresponding language
+                  Kit.i18n({ cn: '用户名' }, 'username')
+                ),
+            })
+        );
       },
     },
   },
 });
 ```
 
-## default options
+## default options for the plugin
 
 ```js
 const defaultOptions = {
   getResources = () => ({}),
-  parseLanguage = (request) => request.query.lang,
+  parseLanguage = (request) => 'en',
   setMixin = ({ options, Kit, Joi }) => {
-    Kit.joi = () => Joi;
     options.Kit = Kit;
     options.Joi = Joi;
   }
 }
 ```
-
-## todo
-
-check the param of the Kit.schema
