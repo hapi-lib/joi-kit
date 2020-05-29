@@ -27,7 +27,7 @@ server.register('@hapi-lib/joi-kit', {
   // assign to validate options to be used in the route
   // the options is the validate options
   setMixin({ server, request, options, Kit, Joi, extend }) {
-    options.Joi = () => Joi;
+    options.Joi = Joi;
     options.Kit = Kit;
     // you can also assign other data to the options
   },
