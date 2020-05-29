@@ -1,5 +1,7 @@
 # joi-kit
 
+[validate options](https://github.com/hapijs/joi/blob/master/API.md#anyvalidatevalue-options)
+
 ## install
 
 ```
@@ -10,7 +12,7 @@ npm install @hapi-lib/joi-kit
 
 ```js
 server.register('@hapi-lib/joi-kit', {
-  // set the message resource
+  // get the message resource
   async getResources(server) {
     return {
       cn: require('@hapi-lib/joi-kit/i18n/cn.js'),
@@ -20,21 +22,19 @@ server.register('@hapi-lib/joi-kit', {
   },
 
   // parse the language from the request
-  parseLanguage(request) {
-    return 'en';
-  },
+  parseLanguage: (request) => 'en',
 
   // assign to validate options to be used in the route
-  setMixin({ server, request, options, Kit, Joi }) {
+  // the options is the validate options
+  setMixin({ server, request, options, Kit, Joi, extend }) {
     options.Joi = () => Joi;
     options.Kit = Kit;
+    // you can also assign other data to the options
   },
 });
 ```
 
 ## use in router
-
-[validate options](https://github.com/hapijs/joi/blob/master/API.md#anyvalidatevalue-options)
 
 ```js
 server.route({
@@ -45,16 +45,18 @@ server.route({
       payload(value, { Kit }) {
         return (
           Kit
+
             // kit.options set joi validate options, it is not for the joi-kit plugin
             .options({
-              errors: {
-                wrap: {
-                  label: '^',
-                },
-              },
+              // errors: {
+              //   wrap: {
+              //     label: '^',
+              //   },
+              // },
             })
+
             // use format for object
-            // or use schema for a Joi schema, eg:
+            // or use schema for a Joi schema, as:
             // .schema(Joi.objects().keys({
             //   username: Joi.string().min(3).max(18).required(),
             // }))
