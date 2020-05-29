@@ -16,20 +16,20 @@ server.register('@hapi-lib/joi-kit', {
       cn: require('@hapi-lib/joi-kit/i18n/cn.js'),
       foo: require('path/to/foo.js'),
       baz: {},
-    }
+    };
   },
 
   // parse the language from the request
   parseLanguage(request) {
-    return request.query.lang || 'en'
+    return 'en';
   },
 
   // assign to validate options to be used in the route
   setMixin({ server, request, options, Kit, Joi }) {
-    Kit.joi = () => Joi
-    options.Kit = Kit
+    Kit.joi = () => Joi;
+    options.Kit = Kit;
   },
-})
+});
 ```
 
 ## use in router
@@ -43,9 +43,27 @@ server.route({
       payload(value, { Kit }) {
         return Kit.schema({
           username: Kit.joi().string().min(3).max(18).required(),
-        })
+        });
       },
     },
   },
-})
+});
 ```
+
+## default options
+
+```js
+const defaultOptions = {
+  getResources = () => ({}),
+  parseLanguage = (request) => request.query.lang,
+  setMixin = ({ options, Kit, Joi }) => {
+    Kit.joi = () => Joi;
+    options.Kit = Kit;
+    options.Joi = Joi;
+  }
+}
+```
+
+## todo
+
+check the param of the Kit.schema
