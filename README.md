@@ -20,7 +20,7 @@ server.register('@hapi-lib/joi-kit', {
     };
   },
 
-  //
+  // will be used as the resource of kit().t(/* 'username' */)
   async getResources(server) {
     return {
       zh: {
@@ -53,33 +53,30 @@ server.route({
   method: 'POST',
   options: {
     validate: {
-      payload(value, { kit }) {
-        return (
-          kit()
-            // kit.options set joi validate options, it is not for the joi-kit plugin
-            .options({
-              // errors: {
-              //   wrap: {
-              //     label: '^',
-              //   },
-              // },
-            })
+      payload: (value, { kit }) =>
+        kit()
+          // kit.options set joi validate options, it is not for the joi-kit plugin
+          .options({
+            // errors: {
+            //   wrap: {
+            //     label: '^',
+            //   },
+            // },
+          })
 
-            // use params for object
-            // or use schema for a Joi schema, as:
-            // .schema(Joi.objects().keys({
-            //   username: Joi.string().min(3).max(18).required(),
-            // }))
-            .params({
-              username: Joi.string()
-                .min(3)
-                .max(18)
-                .required()
-                .label(kit().t('username')),
-            })
-            .validate(value)
-        );
-      },
+          // use params for object
+          // or use schema for a Joi schema, as:
+          // .schema(Joi.objects().keys({
+          //   username: Joi.string().min(3).max(18).required(),
+          // }))
+          .params({
+            username: Joi.string()
+              .min(3)
+              .max(18)
+              .required()
+              .label(kit().t('username')),
+          })
+          .validate(value),
     },
   },
 });
